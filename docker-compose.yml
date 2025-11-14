@@ -1,0 +1,56 @@
+# Docker Compose file version
+version: '3.8'
+
+services:
+  # 1. 'mysql-db' service එක define කරනවා
+  mysql-db:
+    # Assignment requirement: mysql:8.0 image එක use කරනවා
+    image: mysql:8.0
+    container_name: mysql-db
+    # MySQL database එක restart වුනොත් data නැතිවෙන්නේ නෑ
+    volumes:
+      - mysql-data:/var/lib/mysql
+    # Database configuration (environment variables)
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=eventstream_db
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+    ports:
+      # Local machine එකේ 3307 port එක, container එකේ 3306 port එකට map කරනවා
+      # (3306 use කරන්නේ නැත්තේ local machine එකේ MySQL install කරලා තිබ්බොත් conflict වෙන නිසා)
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. 'app-service' (අපේ Spring Boot app) එක define කරනවා
+  app-service:
+    container_name: app-service
+    # 'Dockerfile' එක තියෙන තැන ඉඳන් build කරන්න කියනවා
+    build: .
+    ports:
+      # Local machine එකේ 8080 port එක, container එකේ 8080 port එකට map කරනවා
+      - "8080:8080"
+    # Assignment requirement: Database config, environment variables විදියට pass කරනවා
+    environment:
+      # H2 settings 'override' කරලා, MySQL වලට connect වෙන්න කියනවා
+      # මේ line එක හොයලා, අගට &allowPublicKeyRetrieval=true එකතු කරන්න
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/eventstream_db?useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+      # 'update' වෙනුවට 'create-drop' use කරමු test එකට.
+      # හැම 'docker-compose up' පාරකම tables අලුතෙන් හදනවා.
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.MySQLDialect
+    # 'mysql-db' service එක 'healthcheck' එක 'pass' වෙනකම්
+    # 'app-service' එක start කරන්නේ නෑ
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+
+# Database data store කරන්න 'volume' එකක් define කරනවා
+volumes:
+  mysql-data:
