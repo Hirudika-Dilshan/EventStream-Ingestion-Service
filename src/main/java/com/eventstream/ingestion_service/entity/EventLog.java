@@ -4,17 +4,17 @@ import jakarta.persistence.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "event_logs") // Database table එකේ නම
+@Table(name = "event_logs") 
 public class EventLog {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // ID එක auto-increment වෙන්න
+    @GeneratedValue(strategy = GenerationType.IDENTITY) 
     private Long id;
 
-    @Column(nullable = false) // මේ column එක null වෙන්න බෑ
+    @Column(nullable = false) 
     private String eventType;
 
-    @Column(nullable = false) // මේ column එක null වෙන්න බෑ
+    @Column(nullable = false) 
     private String userId;
 
     @Column(nullable = false)
@@ -24,11 +24,11 @@ public class EventLog {
 
     private String device;
 
-    // JPA (database library) එකට 'no-argument constructor' එකක් ඕනේ
+   
     public EventLog() {
     }
 
-    // අපිට object එකක් හදන්න ලේසි වෙන්න constructor එකක්
+    
     public EventLog(String eventType, String userId, Instant timestamp, String ipAddress, String device) {
         this.eventType = eventType;
         this.userId = userId;
@@ -38,9 +38,7 @@ public class EventLog {
     }
 
     // --- Getters and Setters ---
-    // JPA වලට මේ 'getter' සහ 'setter' methods ඕනේ
-    // data read/write කරන්න.
-
+    
     public Long getId() {
         return id;
     }
