@@ -2,9 +2,9 @@ package com.eventstream.ingestion_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.EnableAsync; // <-- මේ import එකත් add වෙන්න ඕනේ
+import org.springframework.scheduling.annotation.EnableAsync; 
 
-@EnableAsync // <-- මේක තමයි අලුතෙන් add කරන්න ඕන annotation එක
+@EnableAsync 
 @SpringBootApplication
 public class IngestionServiceApplication {
 
